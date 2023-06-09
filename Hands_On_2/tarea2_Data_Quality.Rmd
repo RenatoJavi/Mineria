@@ -1,0 +1,162 @@
+---
+title: "Hands On: Data Quality and Pre-Processing"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+(a) Check if there are any missing values.
+
+```{r}
+file.choose()
+load("C:/Proyectos ML/Data Quality and Pre-Processing/Data Quality and Pre-Processing/tidyimpute/carInsurance.Rdata" )
+ls()
+
+```
+
+(b) Count the number of cases that have, at least, one missing value
+
+
+```{r}
+
+file.choose()
+
+load("C:/Proyectos ML/Data Quality and Pre-Processing/Data Quality and Pre-Processing/tidyimpute/carInsurance.Rdata")
+
+# Verificar los objetos cargados
+ls()
+# Leer el objeto como un data frame
+data <- as.data.frame(carIns)
+filtered_data <- data %>% filter(rowSums(is.na(.)) > 0)
+print(filtered_data)
+```
+
+
+(c) Create a new data set by removing all the cases that have missing values.
+
+```{r}
+library(dplyr)
+file.choose()
+load("C:/Proyectos ML/Data Quality and Pre-Processing/Data Quality and Pre-Processing/tidyimpute/carInsurance.Rdata")
+df <- as.data.frame(carIns)
+filtra <- df[complete.cases(df) ==  FALSE,]
+print(filtra)
+
+eliminar_na <- na.omit(df)
+print(eliminar_na)
+save(eliminar_na, file = "nueva_data.Rdata" )
+  
+  
+  
+
+
+``` 
+
+
+(d) Create a new data set by imputing all the missing values with 0.
+
+
+```{r}
+
+library(dplyr)
+file.choose()
+load("C:/Proyectos ML/Data Quality and Pre-Processing/Data Quality and Pre-Processing/tidyimpute/carInsurance.Rdata")
+na_indice <- is.na(carIns) #indicar los valores NA
+#se utiliza la notación de corchetes [ ] para filtrar 
+valor_cambio <- 0.0
+carIns[na_indice] <- valor_cambio
+save(carIns, file="new_data_carIns.Rdata")
+
+
+
+```
+
+
+```{r}
+library(streamR)
+
+# Crear un flujo de datos simulado
+stream <- data.frame(
+  timestamp = Sys.time() + seq(0, 10, by = 2),
+  evento = c("Evento 1", "Evento 2", "Evento 3", "Evento 4", "Evento 5")
+)
+
+# Definir una función de procesamiento para cada evento
+procesar_evento <- function(evento) {
+  # Realizar alguna acción o análisis con el evento
+  print(paste("Procesando evento:", evento))
+}
+
+# Configurar el modelo de Stream
+modelo_stream <- Stream$new(
+  data = stream,
+  processFUN = procesar_evento,
+  time_column = "timestamp"
+)
+
+# Iniciar el procesamiento del flujo de datos
+modelo_stream$run()
+
+
+```
+taller 3
+
+```{r}
+#file.choose();
+datos <- load("D:/Datos ML/carIns_final.Rdata")
+ls()
+data <- as.data.frame(carIns_final)
+
+print(data)
+
+salida <- data[data$bodyStyle]
+#filtered_data <- data %>% filter(make)
+filtered_data <- data %>% group_by(bodyStyle)%>%unique()
+print(filtered_data)
+ carIns_final %>% group_by(bodyStyle,cityMpg)%>% count()
+ #b
+  carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean=mean(cityMpg))
+ #carIns_final %>% group_by(bodyStyle,cityMpg)%>% summarise(cityMpg.mea)
+  
+  #c
+  carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),cityMpg.sd = sd(cityMpg))
+  #d
+   carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),cityMpg.sd = sd(cityMpg),highwayMpg.mean = mean(highwayMpg))
+
+ggplot(carIns_final,aes(x = cityMpg, y = highwayMpg))+geom_point()
+```
+
+Graficar datos
+
+```{r}
+ggplot(carIns_final,aes(x = cityMpg, y = highwayMpg))+geom_point()
+
+```
+
+
+```{r}
+ggplot(carIns_final,aes(x = bodyStyle))+geom_bar() 
+
+```
+
+nuevo
+```{r}
+# Cargar el paquete ggplot2
+library(ggplot2)
+
+# Crear un data frame con los datos
+datos <- data.frame(
+  x = c(1, 2, 3, 4, 5),
+  y = c(2, 4, 6, 8, 10)
+)
+
+# Crear el gráfico de dispersión
+ggplot(datos, aes(x = x, y = y)) +
+  geom_point() +
+  labs(x = "Eje X", y = "Eje Y", title = "Gráfico de dispersión")
+
+```
+
+
