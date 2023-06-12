@@ -140,14 +140,14 @@ print(moda)
 ```
 
 (h) Combine the three last imputations to obtain a final dataset. Are there any duplicated cases?
-```{r , echo = TRUE , comment=" "}
+```{r}
 
 library(DescTools)
 
 load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
 
-#data <- as.data.frame(carIns_final)
-data <- as.data.frame(eliminar_na)
+data <- as.data.frame(carIns_final)
+#data <- as.data.frame(eliminar_na)
 
 #calcular la media
 #data <- as.data.frame(eliminar_na)
@@ -185,30 +185,100 @@ valores_duplicados <- intersect(media, moda_data)
  print("valores duplicados")
  
  print( valores_duplicados)
-
+ 
 
 ```
-## **2 Data Pre-Processing**
 
+
+## **2 Data Pre-Processing**
+#Load the package dlookr. Use the same car insurance data set above and apply the following
+transformations to the price attribute. Be critical regarding the obtained results.
+
+(a)Apply range-based normalization and z-score normalization.
 
 ```{r}
-# Instalar y cargar la librería knitr
-install.packages("knitr")
-library(knitr)
 
-# Crear un data frame de ejemplo
-data <- data.frame(
-  Column1 = c(1, 2, 3),
-  Column2 = c("A", "B", "C")
-)
+load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+#data <- as.data.frame(carIns_final)
+data <- as.data.frame(carIns_final)
+data_col  <-subset(data, select = bodyStyle)
+print(data_col)
 
-# Formatear los datos en una tabla HTML
-tabla_html <- kable(data)
 
-# Guardar la tabla HTML en un archivo
-writeLines(tabla_html, "resultados.html")
+
+
 
 ```
+(b) Discretize it into 4 equal-frequency ranges an into 4 equal-width ranges.
+```{r}
+
+###
+load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+data <- as.data.frame(carIns_final)
+data$price <- cut(data$price , breaks = 4, labels = FALSE)
+cuartil_auto <- subset(data , select = c(price, make))
+print(cuartil_auto)
+
+```
+## 3  With the seed 111019 obtain the following samples on the car insurance data set.
+(a) A random sample of 60% of the cases, with replacement
+```{r}
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+data <- as.data.frame(carIns_final)
+# Set the seed
+set.seed(111019)
+
+# Load the car insurance dataset (assuming it is already available)
+car_insurance <- data
+
+# Sample 70% of the data
+sample_60 <- sample_frac(car_insurance, 0.6)
+print(sample_60)
+
+# Sample 20% of the remaining data
+sample_20 <- sample_frac(car_insurance[!(row.names(car_insurance) %in% row.names(sample_60)), ], 0.2)
+print(sample_20)
+# Sample the remaining 10% of the data
+sample_10 <- sample_frac(car_insurance[!(row.names(car_insurance) %in% row.names(sample_70)) & !(row.names(car_insurance) %in% row.names(sample_20)), ], 0.1)
+
+
+```
+(b) A stratified sample of 60% of the cases of cars, according to the fuelType attribute
+```{r}
+
+# Install and load the splitstackshape package
+#install.packages("splitstackshape")
+library(splitstackshape)
+load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+data <- as.data.frame(carIns_final)
+# Set the seed
+set.seed(111019)
+
+
+
+# Set the seed
+set.seed(111019)
+
+# Load the car dataset (assuming it is already available)
+car_data <- data
+
+# Create a stratified sample based on fuelType attribute
+strat_campo <- stratified(car_data, "fuelType", 0.6)
+
+# View the stratified sample
+print(strat_campo)
+
+
+```
+(c) Use the table() function to inspect the distribution of values in each of the two samples above.
+```{r}
+
+
+
+```
+
+
 
 
 
