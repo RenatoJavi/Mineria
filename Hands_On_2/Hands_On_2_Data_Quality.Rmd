@@ -3,16 +3,218 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
-```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
 The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+(a) Check if there are any missing values.
+
+```{r}
+#file.choose()
+load("C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata" )
+ls()
+
+```
+
+(b) Count the number of cases that have, at least, one missing value
+
+
+```{r}
+library(dplyr)
+#file.choose()
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata")
+
+# Verificar los objetos cargados
+ls()
+# Leer el objeto como un data frame
+data <- as.data.frame(carIns)
+filtered_data <- data %>% filter(rowSums(is.na(.)) > 0)
+print(filtered_data)
+```
+
+(c) Create a new data set by removing all the cases that have missing values.
+
+```{r}
+library(dplyr)
+#file.choose()
+load("C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata")
+df <- as.data.frame(carIns)
+filtra <- df[complete.cases(df) ==  TRUE,]
+print(filtra)
+
+eliminar_na <- na.omit(df)
+#print(eliminar_na)
+save(eliminar_na, file = "nueva_data1.Rdata" )
+print(eliminar_na)
+```
+(d) Create a new data set by imputing all the missing values with 0.
+
+
+```{r}
+
+library(dplyr)
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata")
+mi_df <- as.data.frame(carIns)
+valor_entero <- mi_df
+valor_entero[is.na(valor_entero)] <- 0 
+print(valor_entero)
+save(valor_entero, file = 'Nuevo_set.Rdata')
+
+load('C:/Proyectos ML/Mineria/Hands_On_2/Nuevo_set.Rdata')
+print(as.data.frame(valor_entero))
+
+#REVISAR
+#columna_nDoors <- subset(valor_entero, select = nDoors)
+#print(columna_nDoors)
+#char_data <- as.character(levels(columna_nDoors))
+#char_levels <- as.character(levels(char_data))
+```
+(e) Create a new data set by imputing the mean in all the columns which have double type values
+
+
+
+```{r}
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/nueva_data1.Rdata")
+
+data <- as.data.frame(eliminar_na)
+# Seleccionar solo las columnas numéricas
+columnas_numericas <- sapply(data, is.numeric)
+data_numericas <- data[, columnas_numericas]
+
+# Calcular la media en las columnas numéricas
+media <- colMeans(data_numericas)
+
+# Imprimir la media por columna
+print(media)
+
+```
+(f) Create a new data set by imputing the mode in all the columns which have integer type values.
+
+
+```{r}
+
+# Instalar el paquete DescTools si no está instalado
+# install.packages("DescTools")
+
+# Cargar el paquete DescTools
+library(DescTools)
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/nueva_data1.Rdata")
+
+data <- as.data.frame(eliminar_na)
+
+# Calcular la moda en todas las columnas del data frame
+moda_data <- sapply(data, Mode)
+
+# Imprimir la moda por columna
+print(moda_data)
+
+
+
+```
+(g) Create a new data set by imputing the most frequent value to the column ”nDoors”
+
+```{r}
+
+library(DescTools)
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/nueva_data1.Rdata")
+
+data <- as.data.frame(eliminar_na)
+salida <- subset(data , select = nDoors)
+#salida <- data$nDoors
+#print(salida)
+# Calcular la moda de la columna "nDoors"
+moda <- Mode(data$nDoors)
+
+data$nDoors[is.na(data$nDoors)] <- moda
+print(moda)
+
+```
+
+(h) Combine the three last imputations to obtain a final dataset. Are there any duplicated cases?
+```{r , echo = TRUE , comment=" "}
+
+library(DescTools)
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+
+#data <- as.data.frame(carIns_final)
+data <- as.data.frame(eliminar_na)
+
+#calcular la media
+#data <- as.data.frame(eliminar_na)
+# Seleccionar solo las columnas numéricas
+columnas_numericas <- sapply(data, is.numeric)
+data_numericas <- data[, columnas_numericas]
+
+# Calcular la media en las columnas numéricas
+media <- colMeans(data_numericas)
+
+# Imprimir la media por columna
+print("Media")
+print(media)
+
+###############
+
+#datos moda
+# Calcular la moda en todas las columnas del data frame
+moda_data <- sapply(data, Mode)
+# Imprimir la moda por columna
+print("MOda")
+print(moda_data)
+##############
+# Busacar valores duplicados
+# Calcular la media en un data frame
+#media <- colMeans(data)
+
+# Calcular la moda en un data frame
+#moda <- Mode(data)
+
+# Encontrar valores duplicados entre la media y la moda
+valores_duplicados <- intersect(media, moda_data)
+
+# Imprimir los valores duplicados
+ print("valores duplicados")
+ 
+ print( valores_duplicados)
+
+
+```
+## **2 Data Pre-Processing**
+
+
+```{r}
+# Instalar y cargar la librería knitr
+install.packages("knitr")
+library(knitr)
+
+# Crear un data frame de ejemplo
+data <- data.frame(
+  Column1 = c(1, 2, 3),
+  Column2 = c("A", "B", "C")
+)
+
+# Formatear los datos en una tabla HTML
+tabla_html <- kable(data)
+
+# Guardar la tabla HTML en un archivo
+writeLines(tabla_html, "resultados.html")
+
+```
+
+
+
+
+
+
+
+
+
