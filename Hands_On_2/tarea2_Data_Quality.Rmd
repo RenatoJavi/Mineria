@@ -11,9 +11,9 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 ```{r}
 file.choose()
-load("C:/Proyectos ML/Data Quality and Pre-Processing/Data Quality and Pre-Processing/tidyimpute/carInsurance.Rdata" )
+load("C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata" )
 ls()
-
+#C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata
 ```
 
 (b) Count the number of cases that have, at least, one missing value
@@ -21,9 +21,9 @@ ls()
 
 ```{r}
 
-file.choose()
+#file.choose()
 
-load("C:/Proyectos ML/Data Quality and Pre-Processing/Data Quality and Pre-Processing/tidyimpute/carInsurance.Rdata")
+load("C:/Proyectos ML/Mineria/Hands_On_2/carInsurance.Rdata")
 
 # Verificar los objetos cargados
 ls()
@@ -69,8 +69,6 @@ valor_cambio <- 0.0
 carIns[na_indice] <- valor_cambio
 save(carIns, file="new_data_carIns.Rdata")
 
-
-
 ```
 
 
@@ -108,10 +106,11 @@ taller 3
 datos <- load("D:/Datos ML/carIns_final.Rdata")
 ls()
 data <- as.data.frame(carIns_final)
+#print(data)
 
-print(data)
+#salida <- data[data$bodyStyle]
+#print(salida)
 
-salida <- data[data$bodyStyle]
 #filtered_data <- data %>% filter(make)
 filtered_data <- data %>% group_by(bodyStyle)%>%unique()
 print(filtered_data)
@@ -122,6 +121,7 @@ print(filtered_data)
   
   #c
   carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),cityMpg.sd = sd(cityMpg))
+  carIns_final %>% group_by()
   #d
    carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),cityMpg.sd = sd(cityMpg),highwayMpg.mean = mean(highwayMpg))
 
