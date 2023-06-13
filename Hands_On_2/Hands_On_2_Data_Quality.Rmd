@@ -198,11 +198,22 @@ transformations to the price attribute. Be critical regarding the obtained resul
 
 ```{r}
 
+library(dplyr)
+
+# Convertir el objeto en un dataframe
 load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
-#data <- as.data.frame(carIns_final)
-data <- as.data.frame(carIns_final)
-data_col  <-subset(data, select = bodyStyle)
-print(data_col)
+dfNorm <- as.data.frame(carIns)
+
+dfNorm <- dfNorm %>%
+  mutate(
+          # Aplica la normalización basada en rangos
+          precioNormRango = (price - min(price, na.rm = TRUE)) / (max(price, na.rm = TRUE) - min(price, na.rm = TRUE)), # Escala los valores de la columna de precio al rango [0,1]
+          # Aplica la normalización Z-score
+          precioNormZscore = (price - mean(price, na.rm = TRUE)) / sd(price, na.rm = TRUE)
+)
+
+# Imprime el nuevo dataframe
+print(dfNorm)
 
 
 
