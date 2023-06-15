@@ -1,0 +1,177 @@
+---
+title: "Hands On 3 Data"
+output: html_notebook
+---
+
+## 1 Summarization
+
+
+(a) Obtain the number of cars by bodyStyle.
+```{r}
+
+library(dplyr)
+datos <- load("C:/Proyectos ML/Mineria/Hands On_3 Data Exploration/data/carIns_final.Rdata")
+data <- as.data.frame(carIns_final)
+
+filtered_num <- data %>% group_by(bodyStyle)%>%unique() %>% count()
+
+```
+
+```{r}
+library(ggplot2)
+
+# Create a bar plot of car counts by bodyStyle
+ggplot(data, aes(x = bodyStyle)) +
+  geom_bar(fill = "lightblue", color = "black") +
+  labs(x = "Body Style", y = "Count") +
+  ggtitle("Number of Cars by Body Style") +
+  theme_minimal()
+
+```
+(b) Obtain the number of cars by bodyStyle and fuelType
+
+```{r}
+
+data %>% group_by(bodyStyle,fuelType)%>% count()
+
+
+```
+(c) Obtain the mean and the standard deviation of the attribute cityMpg by bodyStyle in ascending order.
+```{r}
+
+carIns_final %>% group_by(bodyStyle)%>%summarise(cityMpg.mean = mean(cityMpg), cityMpg.sd = sd(cityMpg) )%>% arrange(cityMpg.mean)
+``` 
+(d) Also by bodyStyle, and for the attributes cityMpg and highwayMpg, obtain the mean, the standard
+deviation, the median and the inter-quartile range.
+```{r}
+library(ggplot2)
+  carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),
+  cityMpg.sd = sd(cityMpg),carretera = IQR(highwayMpg))
+
+```
+## Visualization
+
+(e) Show the relationship between the attributes cityMpg and highwayMpg
+```{r}
+
+
+ggplot(carIns_final,aes(x = cityMpg, y = highwayMpg))+geom_point( color = "red")+ggtitle("Relation entre City  & Hightway")
+
+```
+(f) Show the distribution of cars by bodyStyle.
+
+```{r}
+
+ggplot(carIns_final,aes(x = bodyStyle))+ geom_bar(fill = "lightblue", color = "black")
+       
+
+
+```
+(g) Show the distribution of cars by price. Suggestion: create bins of width equal to 5000.
+```{r}
+
+# Create price bins with a width of 5000
+price_bins <- seq(0, max(data$price), by = 5000)
+
+# Cut the prices into bins
+price_categories <- cut(data$price, breaks = price_bins, include.lowest = TRUE)
+ggplot(carIns_final,aes(x=price_categories))+geom_bar(fill = "lightblue", color = "black")+labs(x = "Price Category", y = "Count") +
+  ggtitle("Distribution of Cars by Price")
+
+
+```
+(h) Add the information of the density estimation to the previous graph
+```{r}
+
+library(ggplot2)
+
+# Create price bins with a width of 5000
+price_bins <- seq(0, max(carIns_final$price), by = 5000)
+
+
+# Cut the prices into bins
+data$price_category <- cut(data$price, breaks = price_bins, include.lowest = TRUE)
+
+# Create a density plot of car prices
+ggplot(data, aes(x = price)) +
+  geom_density(fill = "lightblue", alpha = 0.5) +
+  geom_vline(aes(xintercept = mean(price)), color = "red", linetype = "dashed", size = 1) +
+  labs(x = "Price", y = "Density") +
+  ggtitle("Density Estimation of Car Prices") +
+  theme_minimal()
+
+
+```
+(i) Check (visually) if it is plausible to consider that price follows a normal distribution.
+```{r}
+
+library(ggplot2)
+library(dplyr)
+library(ggfittext)
+
+# Create a histogram with density curve
+ggplot(data, aes(x = price)) +
+  geom_histogram(binwidth = 5000, fill = "lightblue", color = "black", alpha = 0.5) +
+  stat_function(fun = dnorm, args = list(mean = mean(data$price), sd = sd(data$price)), color = "red", size = 1) +
+  labs(x = "Price", y = "Frequency") +
+  ggtitle("Distribution of Car Prices") +
+  theme_minimal()
+
+```
+(j) Show the distribution of price by make attribute. Suggestion: use boxplots and the function coord_flip().
+```{r}
+library(ggplot2)
+
+# Create a boxplot of price by make
+ggplot(data, aes(x = make, y = price)) +
+  geom_boxplot(fill = "lightblue", color = "black", outlier.shape = NA) +
+  coord_flip() +
+  labs(x = "Make", y = "Price") +
+  ggtitle("Distribution of Price by Make") +
+  theme_minimal()
+
+```
+(k) Show the distribution of price by nDoors attribute. Suggestion: use histograms.
+```{r}
+library(ggplot2)
+
+# Create a histogram of price by nDoors
+ggplot(data, aes(x = price, fill = nDoors)) +
+  geom_histogram(binwidth = 2000, color = "black", alpha = 0.9) +
+  labs(x = "Price", y = "Count") +
+  ggtitle("Distribution of Price by nDoors") + theme_dark()
+  
+
+```
+(l) Show the distribution of price by bodyStyle and nDoors attributes. Suggestion: use histograms
+```{r}
+library(ggplot2)
+
+# Create a histogram of price by bodyStyle and nDoors
+ggplot(data, aes(x = price, fill = nDoors)) +
+  geom_histogram(binwidth = 5000, color = "black", alpha = 0.9) +
+  facet_wrap(~ bodyStyle, ncol = 2) +
+  labs(x = "Price", y = "Count") +
+  ggtitle("Distribution of Price by Body Style and nDoors") +
+  theme_bw()
+
+```
+(m) Add the parameter scales="free_y" to the facet function in the previous graph.
+```{r}
+library(ggplot2)
+
+# Create a histogram of price by bodyStyle and nDoors
+ggplot(data, aes(x = price, fill = nDoors)) +
+  geom_histogram(binwidth = 5000, color = "black", alpha = 1) +
+  facet_wrap(~ bodyStyle, scales = "free_y", ncol = 2) +
+  labs(x = "Price", y = "Count") +
+  ggtitle("Distribution of Price by Body Style and nDoors") +
+  theme_minimal()
+
+
+```
+
+
+
+
+
