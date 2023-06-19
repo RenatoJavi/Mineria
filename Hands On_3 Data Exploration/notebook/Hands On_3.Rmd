@@ -1,20 +1,23 @@
 ---
-title: "Hands On 3 Data"
-output: html_notebook
+title: '3 Hands On: Data Exploration'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
 ---
 
-## 1 Summarization
+**1. Summarization**
+
+*Load the data set carIns final. It already has the imputation of missing values.*
 
 
 (a) Obtain the number of cars by bodyStyle.
 ```{r}
-
 library(dplyr)
 datos <- load("C:/Proyectos ML/Mineria/Hands On_3 Data Exploration/data/carIns_final.Rdata")
 data <- as.data.frame(carIns_final)
-
-filtered_num <- data %>% group_by(bodyStyle)%>%unique() %>% count()
-
+leerDato<- data%>%group_by(bodyStyle)%>% count()
+print(leerDato)
 ```
 
 ```{r}
@@ -28,6 +31,7 @@ ggplot(data, aes(x = bodyStyle)) +
   theme_minimal()
 
 ```
+
 (b) Obtain the number of cars by bodyStyle and fuelType
 
 ```{r}
@@ -36,38 +40,41 @@ data %>% group_by(bodyStyle,fuelType)%>% count()
 
 
 ```
+
 (c) Obtain the mean and the standard deviation of the attribute cityMpg by bodyStyle in ascending order.
+
 ```{r}
 
 carIns_final %>% group_by(bodyStyle)%>%summarise(cityMpg.mean = mean(cityMpg), cityMpg.sd = sd(cityMpg) )%>% arrange(cityMpg.mean)
 ``` 
+
 (d) Also by bodyStyle, and for the attributes cityMpg and highwayMpg, obtain the mean, the standard
 deviation, the median and the inter-quartile range.
+
 ```{r}
 library(ggplot2)
   carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),
   cityMpg.sd = sd(cityMpg),carretera = IQR(highwayMpg))
 
 ```
-## Visualization
+**2. Visualization**
+
+*Using the package ggplot2, create graphs that you find adequate to answer the following questions*
 
 (e) Show the relationship between the attributes cityMpg and highwayMpg
+
 ```{r}
-
-
 ggplot(carIns_final,aes(x = cityMpg, y = highwayMpg))+geom_point( color = "red")+ggtitle("Relation entre City  & Hightway")
-
 ```
+
 (f) Show the distribution of cars by bodyStyle.
 
 ```{r}
-
 ggplot(carIns_final,aes(x = bodyStyle))+ geom_bar(fill = "lightblue", color = "black")
-       
-
-
 ```
+
 (g) Show the distribution of cars by price. Suggestion: create bins of width equal to 5000.
+
 ```{r}
 
 # Create price bins with a width of 5000
@@ -80,7 +87,9 @@ ggplot(carIns_final,aes(x=price_categories))+geom_bar(fill = "lightblue", color 
 
 
 ```
+
 (h) Add the information of the density estimation to the previous graph
+
 ```{r}
 
 library(ggplot2)
@@ -102,7 +111,9 @@ ggplot(data, aes(x = price)) +
 
 
 ```
+
 (i) Check (visually) if it is plausible to consider that price follows a normal distribution.
+
 ```{r}
 
 library(ggplot2)
@@ -118,18 +129,18 @@ ggplot(data, aes(x = price)) +
   theme_minimal()
 
 ```
+
 (j) Show the distribution of price by make attribute. Suggestion: use boxplots and the function coord_flip().
+
 ```{r}
 library(ggplot2)
-
 # Create a boxplot of price by make
 ggplot(data, aes(x = make, y = price)) +
   geom_boxplot(fill = "lightblue", color = "black", outlier.shape = NA) +
   coord_flip() +
   labs(x = "Make", y = "Price") +
   ggtitle("Distribution of Price by Make") +
-  theme_minimal()
-
+  theme_bw()
 ```
 (k) Show the distribution of price by nDoors attribute. Suggestion: use histograms.
 ```{r}
