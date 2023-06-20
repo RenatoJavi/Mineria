@@ -1,0 +1,406 @@
+---
+title: '2 Hands On: Data Quality and Pre-Processing'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+**1. Assessing Data Quality**
+
+*Load the carInsurance data set about the insurance risk rating of cars based on several characteristics of each car.*
+
+(a) Check if there are any missing values.
+
+```{r}
+load("C:/Proyectos ML/Mineria/Hands_On_2/data/carInsurance.Rdata")
+data <- as.data.frame(carIns)
+has_missing_values <- anyNA(data)
+print(has_missing_values)
+
+```
+(b) Count the number of cases that have, at least, one missing value.
+```{r}
+library(dplyr)
+data <- as.data.frame(carIns)
+filas<- nrow(data)
+print(sprintf("Número de filas totales %d",filas))
+filtered_data <- data %>% filter(complete.cases(.))
+filas_completas <-nrow(filtered_data)
+print(sprintf("Número de filas completas %d",filas_completas))
+
+```
+
+(c) Create a new data set by removing all the cases that have missing values.
+
+```{r}
+library(dplyr)
+
+df <- as.data.frame(carIns)
+filtrar <- df[complete.cases(df) ==  TRUE,]
+print(filtrar)
+```
+
+(d) Create a new data set by imputing all the missing values with 0.
+
+```{r}
+#install.packages("tidyimpute")
+library(tidyimpute)
+datos_sin_cero<- carIns %>%na.omit()
+# Cree un nuevo conjunto de datos con valores faltantes imputados como 0
+imputed_data <- impute(datos_sin_cero, method = "fixed", fixed_value = 0)
+
+# View the imputed dataset
+head(imputed_data)
+
+
+```
+
+(e) Create a new data set by imputing the mean in all the columns which have double type values
+
+```{r}
+library(dplyr)
+datos<- carIns%>%filter(complete.cases(.))
+# Create a new dataset by imputing the mean in columns with double type values
+imputed_data <-  datos %>%mutate_if(is.double, ~ ifelse(is.na(.), mean(., na.rm = TRUE), .))
+head(imputed_data)
+
+```
+
+(f) Create a new data set by imputing the mode in all the columns which have integer type values.
+
+```{r}
+# Identify names columns with integer type values
+eliminar_na <- carIns %>%filter(complete.cases(.))
+integer_columns <- sapply(eliminar_na, is.integer)
+seleccionar_columnas <- names(integer_columns[integer_columns])
+print(seleccionar_columnas)
+
+# Funcion para calcular la moda de un vector
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+# Calcular la moda para cada entero en la columna
+modes <- sapply(eliminar_na[, integer_columns], Mode)
+
+# Imprimir el nombre de la columna con su respectiva moda
+for (i in 1:length(modes)) {
+  print(paste("Column:", names(modes)[i], "Mode:", modes[i]))
+}
+
+```
+
+(g) Create a new data set by imputing the most frequent value to the column nDoors
+
+```{r}
+
+# Load the required packages
+library(dplyr)
+
+# Load the carInsurance dataset
+eliminar_na <- carIns%>%na.omit()
+
+# Define the Mode function to calculate the mode of a vector
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Create a new data set by imputing the most frequent value to the column "nDoors"
+new_carInsurance <- carIns %>%
+  mutate(nDoors = ifelse(is.na(nDoors), Mode(nDoors), nDoors))
+
+# Print the new data set
+print(new_carInsurance)
+
+```
+(h) Combine the three last imputations to obtain a final dataset. Are there any duplicated cases?
+```{r}
+
+
+# Load the required packages
+library(dplyr)
+
+# Define the Mode function to calculate the mode of a vector
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Impute missing values in columns with integer type using mode
+carInsurance_imputed_mode <- carIns %>%
+  mutate(across(where(is.integer), ~ ifelse(is.na(.), Mode(.), .)))
+
+# Impute missing values in the "nDoors" column using the most frequent value
+carInsurance_imputed_nDoors <- carInsurance_imputed_mode %>%
+  mutate(nDoors = ifelse(is.na(nDoors), Mode(nDoors), nDoors))
+
+# Convert the "nDoors" column to character type in both datasets
+carInsurance_imputed_mode$nDoors <- as.character(carInsurance_imputed_mode$nDoors)
+carInsurance_imputed_nDoors$nDoors <- as.character(carInsurance_imputed_nDoors$nDoors)
+
+# Combine the imputed datasets to obtain a final dataset
+final_carInsurance <- bind_rows(carInsurance_imputed_mode, carInsurance_imputed_nDoors)
+
+# Check for duplicated cases
+duplicated_cases <- final_carInsurance %>% 
+  distinct() %>% 
+  count() %>% 
+  filter(n > 1)
+
+# Print the duplicated cases
+print(duplicated_cases)
+
+```
+**2. Data Pre-Processing**
+
+Leer the package dlookr. Use the same car insurance data set above and apply the following
+transformations to the price attribute. Be critical regarding the obtained results.
+
+(a)Apply range-based normalization and z-score normalization.
+
+```{r}
+
+library(dplyr)
+
+normalizar<-carIns %>%  mutate(
+          # Aplica la normalizaciÃ³n basada en rangos
+          precioNormRango = (price - min(price, na.rm = TRUE)) / (max(price, na.rm = TRUE) - min(price, na.rm = TRUE)), # Escala los valores de la columna de precio al rango [0,1]
+          # Aplica la normalizaciÃ³n Z-score
+          precioNormZscore = (price - mean(price, na.rm = TRUE)) / sd(price, na.rm = TRUE)
+)
+print(normalizar)
+
+
+
+```
+(b) Discretize it into 4 equal-frequency ranges an into 4 equal-width ranges.
+```{r}
+carIns2<-carIns %>%na.omit()
+
+# Discretize price into 4 equal-frequency ranges
+carIns2$price_freq <- cut(carIns2$price, breaks = quantile(carIns2$price, probs = seq(0, 1, by = 0.25), na.rm = TRUE), labels = FALSE, include.lowest = TRUE)
+
+# Discretize price into 4 equal-width ranges
+carIns2$price_width <- cut(carIns2$price, breaks = 4, labels = FALSE, include.lowest = TRUE)
+
+# Print the transformed data set
+print(carIns2)
+ 
+
+```
+**3. With the seed 111019 obtain the following samples on the car insurance data set.**
+
+(a) A random sample of 60% of the cases, with replacement
+```{r}
+library(dplyr)
+muestra_60 <- sample_frac(carIns, 0.6)
+print(muestra_60)
+
+
+
+```
+(b) A stratified sample of 60% of the cases of cars, according to the fuelType attribute
+```{r}
+
+# Install and load the splitstackshape package
+#install.packages("splitstackshape")
+library(splitstackshape)
+set.seed(111019)
+strat_campo <- stratified(carIns, "fuelType", 0.6)
+
+print(strat_campo)
+
+```
+(c) Use the table() function to inspect the distribution of values in each of the two samples above.
+```{r}
+load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+data <- as.data.frame(carIns_final)
+# Set the seed
+# Set the seed
+set.seed(111019)
+
+# Obtain a random sample of 60% of the cases with replacement
+muestra_data_1 <- sample_frac(data, 0.6, replace = TRUE)$fuelType
+
+# Obtain a random sample of 40% of the cases with replacement
+muestra_data_2 <- sample_frac(data, 0.4, replace = TRUE)$make
+
+# Inspect the distribution of values in each sample
+table_sample_1 <- table(muestra_data_1)
+table_sample_2 <- table(muestra_data_2)
+
+# View the distributions
+cat("Combustible\n")
+print(table_sample_1)
+cat("\nTipo auto\n")
+
+print(table_sample_2)
+
+
+
+```
+**4. Load the package corrplot and select the numeric attributes of the car insurance data set.**
+
+(a) Using the function cor(), obtain the pearson correlation coefficient between each pair of variables.
+
+```{r}
+#install.packages("corrplot")
+library(corrplot)
+numeric_data <- carIns[, sapply(carIns, is.numeric)]
+cor_matrix <- cor(numeric_data)
+
+corrplot(cor_matrix, method = "circle")
+
+```
+(b) Apply the function cor.mtest() to the previous result to calculate the p-values and confidence intervals of the correlation coefficient for each pair of variables.
+
+```{r}
+library(corrplot)
+numeric_data <- carIns[, sapply(carIns, is.numeric)]
+
+cor_matrix <- cor(numeric_data)
+
+library(psych)
+cor_test <- cor.mtest(numeric_data)
+
+
+p_values <- cor_test$p
+
+conf_intervals <- cor_test$uppCI
+
+cat("\n p_values ")
+cat("\n ----------------------------------------------------------- \n")
+print(p_values)
+
+
+cat("\n correlación coeficiente \n")
+cat("----------------------------------------------------------- \n")
+print(conf_intervals)
+```
+
+(c) Plot the all correlation information using the function corrplot. Explore some of its parameters.
+
+```{r}
+#install.packages("corrplot")
+library(corrplot)
+
+numeric_data <- carIns[, sapply(carIns, is.numeric)]
+cor_matrix <- cor(numeric_data)
+
+corrplot(cor_matrix)
+#corrplot(cor_matrix, method = "spearman", type = "lower", tl.cex = 0.8, tl.col = "black", addcolor = "white", col = "RdBu", title = "Correlation Matrix")
+
+
+
+```
+**5. Load the data set USJudgeRatings1, from the datasets package, containing lawyers’ ratings of state judges in the US Superior Court regarding a set of attributes.**
+
+
+(a) Apply the function prcomp() to obtain the principal components. Inspect how each variable is
+obtained by the linear combination of each component.
+```{r}
+
+# Cargar el paquete "datasets" que contiene el conjunto de datos
+library(datasets)
+#USJudgeRatings<- read.csv("C:/Proyectos ML/Mineria/Hands_On_2/data/dataset-29460.csv")
+
+# Cargar el conjunto de datos "USJudgeRatings"
+data(USJudgeRatings)
+# Obtener solo las columnas numéricas del conjunto de datos
+numeric_columns <- USJudgeRatings[, sapply(USJudgeRatings, is.numeric)]
+
+# Aplicar la función prcomp() para obtener los componentes principales
+pca <- prcomp(numeric_columns)
+# Inspeccionar los resultados
+summary(pca)
+```
+
+(b) Load the package ggbiplot and plot the two first components with the function ggbiplot(). You can
+label each point with the lawyer’s name by setting the labels parameter.
+
+```{r}
+
+library(datasets)
+library(ggplot2)
+# Load the USJudgeRatings dataset
+data(USJudgeRatings)
+
+# Apply PCA using prcomp()
+#pca <- prcomp(USJudgeRatings[, 1:12], scale. = TRUE)
+pca <- prcomp(USJudgeRatings[,-1],scale. = TRUE)
+
+# Extract the first two principal components
+pc1 <- pca$x[, 1]
+pc2 <- pca$x[, 2]
+
+# Create a data frame with the PC scores and judge names
+df <- data.frame(pc1, pc2, Judge = USJudgeRatings$CONT)
+
+# Create a scatter plot of the first two components
+ggplot(df, aes(x = pc1, y = pc2, label = Judge)) +
+  geom_point() +
+  geom_text(hjust = 0, vjust = 0) +
+  xlab("Principal Component 1") +
+  ylab("Principal Component 2") +
+  ggtitle("Principal Components Analysis") 
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
