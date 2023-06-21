@@ -1,12 +1,12 @@
 ---
 title: '3 Hands On: Data Exploration'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
-**1. Summarization**
+**1.Summarization**
 
 *Load the data set carIns final. It already has the imputation of missing values.*
 
@@ -17,6 +17,18 @@ library(dplyr)
 datos <- load("C:/Proyectos ML/Mineria/Hands On_3 Data Exploration/data/carIns_final.Rdata")
 data <- as.data.frame(carIns_final)
 leerDato<- data%>%group_by(bodyStyle)%>% count()
+
+
+library(flextable)
+
+# Crear una tabla utilizando flextable()
+tabla <- flextable(leerDato)
+
+# Ajustar automáticamente el ancho de las columnas
+tabla <- autofit(tabla)
+
+# Imprimir la tabla
+#print(tabla)
 print(leerDato)
 ```
 
@@ -44,8 +56,16 @@ data %>% group_by(bodyStyle,fuelType)%>% count()
 (c) Obtain the mean and the standard deviation of the attribute cityMpg by bodyStyle in ascending order.
 
 ```{r}
+library(ggplot2)
 
-carIns_final %>% group_by(bodyStyle)%>%summarise(cityMpg.mean = mean(cityMpg), cityMpg.sd = sd(cityMpg) )%>% arrange(cityMpg.mean)
+
+valores<-carIns_final %>% group_by(bodyStyle)%>%summarise(cityMpg.mean = mean(cityMpg), 
+          cityMpg.sd = sd(cityMpg) )%>% arrange(cityMpg.mean) 
+
+print(valores)
+
+
+
 ``` 
 
 (d) Also by bodyStyle, and for the attributes cityMpg and highwayMpg, obtain the mean, the standard
@@ -55,7 +75,14 @@ deviation, the median and the inter-quartile range.
 library(ggplot2)
   carIns_final %>% group_by(bodyStyle)%>% summarise(cityMpg.mean = mean(cityMpg),
   cityMpg.sd = sd(cityMpg),carretera = IQR(highwayMpg))
-
+  
+library(flextable)
+tabla <- flextable(carIns_final)
+tabla <- autofit(tabla)
+print(tabla)  
+ #   library(gt)
+ #carIns_final %>% gt()
+ 
 ```
 **2. Visualization**
 
@@ -64,7 +91,8 @@ library(ggplot2)
 (e) Show the relationship between the attributes cityMpg and highwayMpg
 
 ```{r}
-ggplot(carIns_final,aes(x = cityMpg, y = highwayMpg))+geom_point( color = "red")+ggtitle("Relation entre City  & Hightway")
+ggplot(carIns_final,aes(x = cityMpg, y = highwayMpg))+geom_point( color = "red")+
+  ggtitle("Relation entre City  & Hightway")
 ```
 
 (f) Show the distribution of cars by bodyStyle.
@@ -80,10 +108,11 @@ ggplot(carIns_final,aes(x = bodyStyle))+ geom_bar(fill = "lightblue", color = "b
 # Create price bins with a width of 5000
 price_bins <- seq(0, max(data$price), by = 5000)
 
+print(price_bins)
 # Cut the prices into bins
 price_categories <- cut(data$price, breaks = price_bins, include.lowest = TRUE)
 ggplot(carIns_final,aes(x=price_categories))+geom_bar(fill = "lightblue", color = "black")+labs(x = "Price Category", y = "Count") +
-  ggtitle("Distribution of Cars by Price")
+  ggtitle("Distribucion de carros por precio")+theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 ```
@@ -181,6 +210,8 @@ ggplot(data, aes(x = price, fill = nDoors)) +
 
 
 ```
+
+
 
 
 

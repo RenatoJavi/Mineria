@@ -1,0 +1,92 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+1. Introduction to Python for Machine Learning
+(a) Create an array of 10 random integers between 1 and 100, and then calculate the mean and
+standard deviation of the array
+```{r}
+
+# Generar una matriz de 10 enteros aleatorios entre 1 y 100
+matriz <- sample(1:100, 10, replace = TRUE)
+
+# Calcular la media de la matriz
+media <- mean(matriz)
+
+# Calcular la desviación estándar de la matriz
+desviacion_standar <- sd(matriz)
+
+# Imprimir los resultados
+print(paste("Matriz:", matriz))
+print(paste("Media:", media))
+print(paste("Desviación estándar:", desviacion_standar))
+
+```
+(b) Create a 2-dimensional array of 3 rows and 4 columns with random integer values. Then, calculate
+the sum of each row and column.
+```{r}
+# Generar una matriz bidimensional de 3 filas y 4 columnas con valores enteros aleatorios
+matriz <- matrix(sample(1:100, 12, replace = TRUE), nrow = 3, ncol = 4)
+
+# Calcular la suma de cada fila
+sumas_filas <- rowSums(matriz)
+
+# Calcular la suma de cada columna
+sumas_columnas <- colSums(matriz)
+
+# Imprimir la matriz y las sumas
+print("Matriz:")
+print(matriz)
+print("Sumas de filas:")
+print(sumas_filas)
+print("Sumas de columnas:")
+print(sumas_columnas)
+
+```
+(c) Create a DataFrame with 3 columns: "Name", "Age", and "City". Add at least 5 rows of data to the
+DataFrame. Then, filter the DataFrame to only include rows where the person's age is greater than
+or equal to 30.
+```{r}
+
+# Cargar la biblioteca "dplyr" para trabajar con DataFrames
+library(dplyr)
+
+# Crear el DataFrame
+df <- data.frame(
+  Name = c("John", "Alicia", "Macarena", "Sarah", "David"),
+  Age = c(25, 32, 41, 28, 35),
+  City = c("New York", "London", "Paris", "Sydney", "Tokyo")
+)
+
+# Filtrar el DataFrame para incluir solo las filas donde la edad es mayor o igual a 30
+df_filtered <- df %>%
+  filter(Age >= 30)
+
+# Imprimir el DataFrame filtrado
+print(df_filtered)
+
+```
+
+(d) Load a CSV file into a DataFrame and then calculate the mean, median, and mode of one of the
+columns in the DataFrame.
+```{r}
+
+
+dframe <-read.csv("C:/Proyectos ML/Mineria/Hands_On_1/Codificado R/datos/dataset-29460.csv")
+  dato_limpio <- na.omit(dframe)
+  dato <- complete.cases(dframe)
+  
+
+ media <- mean(dato_limpio)
+ print(paste("",media))
+ 
+
+```
+
