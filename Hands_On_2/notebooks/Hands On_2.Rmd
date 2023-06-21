@@ -1,9 +1,9 @@
 ---
 title: '2 Hands On: Data Quality and Pre-Processing'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
   word_document: default
 ---
 **1. Assessing Data Quality**
@@ -25,7 +25,7 @@ library(dplyr)
 data <- as.data.frame(carIns)
 filas<- nrow(data)
 print(sprintf("Número de filas totales %d",filas))
-filtered_data <- data %>% filter(complete.cases(.))
+filtered_data <- data %>% stats::filter(complete.cases(.))
 filas_completas <-nrow(filtered_data)
 print(sprintf("Número de filas completas %d",filas_completas))
 
@@ -37,8 +37,13 @@ print(sprintf("Número de filas completas %d",filas_completas))
 library(dplyr)
 
 df <- as.data.frame(carIns)
-filtrar <- df[complete.cases(df) ==  TRUE,]
-print(filtrar)
+nuevaData <- df[complete.cases(df) ==  TRUE,]
+#print(filtrar)
+library(flextable)
+
+datos <- flextable(nuevaData)
+new_tabla<- autofit(datos)
+print(new_tabla)
 ```
 
 (d) Create a new data set by imputing all the missing values with 0.
@@ -215,7 +220,8 @@ print(strat_campo)
 ```
 (c) Use the table() function to inspect the distribution of values in each of the two samples above.
 ```{r}
-load("C:/Proyectos ML/Mineria/Hands_On_2/carIns_final.Rdata")
+
+load("C:/Proyectos ML/Mineria/Hands_On_2/data/carIns_final.Rdata")
 data <- as.data.frame(carIns_final)
 # Set the seed
 # Set the seed
