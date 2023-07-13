@@ -6,6 +6,7 @@ output:
     df_print: paged
   word_document: default
 ---
+
 **1. Assessing Data Quality**
 
 *Load the carInsurance data set about the insurance risk rating of cars based on several characteristics of each car.*
@@ -19,7 +20,9 @@ has_missing_values <- anyNA(data)
 print(has_missing_values)
 
 ```
+
 (b) Count the number of cases that have, at least, one missing value.
+
 ```{r}
 library(dplyr)
 data <- as.data.frame(carIns)
@@ -120,7 +123,9 @@ new_carInsurance <- carIns %>%
 print(new_carInsurance)
 
 ```
+
 (h) Combine the three last imputations to obtain a final dataset. Are there any duplicated cases?
+
 ```{r}
 
 
@@ -158,10 +163,10 @@ duplicated_cases <- final_carInsurance %>%
 print(duplicated_cases)
 
 ```
+
 **2. Data Pre-Processing**
 
-Leer the package dlookr. Use the same car insurance data set above and apply the following
-transformations to the price attribute. Be critical regarding the obtained results.
+Leer the package dlookr. Use the same car insurance data set above and apply the following transformations to the price attribute. Be critical regarding the obtained results.
 
 (a)Apply range-based normalization and z-score normalization.
 
@@ -180,7 +185,9 @@ print(normalizar)
 
 
 ```
+
 (b) Discretize it into 4 equal-frequency ranges an into 4 equal-width ranges.
+
 ```{r}
 carIns2<-carIns %>%na.omit()
 
@@ -195,9 +202,11 @@ print(carIns2)
  
 
 ```
+
 **3. With the seed 111019 obtain the following samples on the car insurance data set.**
 
 (a) A random sample of 60% of the cases, with replacement
+
 ```{r}
 library(dplyr)
 muestra_60 <- sample_frac(carIns, 0.6)
@@ -206,7 +215,9 @@ print(muestra_60)
 
 
 ```
+
 (b) A stratified sample of 60% of the cases of cars, according to the fuelType attribute
+
 ```{r}
 
 # Install and load the splitstackshape package
@@ -218,7 +229,9 @@ strat_campo <- stratified(carIns, "fuelType", 0.6)
 print(strat_campo)
 
 ```
+
 (c) Use the table() function to inspect the distribution of values in each of the two samples above.
+
 ```{r}
 
 load("C:/Proyectos ML/Mineria/Hands_On_2/data/carIns_final.Rdata")
@@ -247,6 +260,7 @@ print(table_sample_2)
 
 
 ```
+
 **4. Load the package corrplot and select the numeric attributes of the car insurance data set.**
 
 (a) Using the function cor(), obtain the pearson correlation coefficient between each pair of variables.
@@ -260,6 +274,7 @@ cor_matrix <- cor(numeric_data)
 corrplot(cor_matrix, method = "circle")
 
 ```
+
 (b) Apply the function cor.mtest() to the previous result to calculate the p-values and confidence intervals of the correlation coefficient for each pair of variables.
 
 ```{r}
@@ -301,11 +316,11 @@ corrplot(cor_matrix)
 
 
 ```
-**5. Load the data set USJudgeRatings1, from the datasets package, containing lawyers’ ratings of state judges in the US Superior Court regarding a set of attributes.**
 
+**5. Load the data set USJudgeRatings1, from the datasets package, containing lawyers' ratings of state judges in the US Superior Court regarding a set of attributes.**
 
-(a) Apply the function prcomp() to obtain the principal components. Inspect how each variable is
-obtained by the linear combination of each component.
+(a) Apply the function prcomp() to obtain the principal components. Inspect how each variable is obtained by the linear combination of each component.
+
 ```{r}
 
 # Cargar el paquete "datasets" que contiene el conjunto de datos
@@ -323,8 +338,7 @@ pca <- prcomp(numeric_columns)
 summary(pca)
 ```
 
-(b) Load the package ggbiplot and plot the two first components with the function ggbiplot(). You can
-label each point with the lawyer’s name by setting the labels parameter.
+(b) Load the package ggbiplot and plot the two first components with the function ggbiplot(). You can label each point with the lawyer's name by setting the labels parameter.
 
 ```{r}
 
@@ -353,60 +367,3 @@ ggplot(df, aes(x = pc1, y = pc2, label = Judge)) +
   ggtitle("Principal Components Analysis") 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
